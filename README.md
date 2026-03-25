@@ -1,0 +1,6 @@
+Concept: GeoRetire Retirement Tool
+
+GeoRetire is an interactive retirement planning tool that estimates a user’s probability of successfully funding retirement based on their personal financial situation and geographic location. Users input key variables such as age, retirement age, current savings, annual contributions, risk tolerance, and zip code. The tool then projects future portfolio value using time value of money and simulates market outcomes using a Monte Carlo framework. A key differentiator between our model and your standard financial planner is the incorporation of location-based cost-of-living adjustments, allowing the model generate a more realistic estimate of required retirement income and savings depending on where the user plans to retire.
+
+GeoRetire integrates core finance concepts including compounding, present value, and risk-return tradeoffs, while also incorporating behavioral finance insights to guide better decision-making. Instead of providing a single outcome, the tool provides a tailored response that increases the user’s probability of success. By combining financial modeling with intuitive design and personalized inputs, our tool aims to deliver a practical, real-world application that users could continue to rely on.
+
