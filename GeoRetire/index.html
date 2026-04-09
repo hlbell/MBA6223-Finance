@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoRetire — Retirement Planning Tool</title>
+  <style>
+    /* ── Reset & Base ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #0d2340;
+      --blue:   #1a4b8c;
+      --sky:    #2e7de0;
+      --accent: #00b09b;
+      --gold:   #f5a623;
+      --light:  #f4f7fc;
+      --muted:  #8a94a6;
+      --white:  #ffffff;
+      --text:   #1c2b3a;
+      --card:   #ffffff;
+      --border: #dce4f0;
+      --success:#27ae60;
+      --warn:   #e67e22;
+      --danger: #e74c3c;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(13,35,64,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: 1.35rem; font-weight: 700; color: var(--white);
+      letter-spacing: -.3px;
+    }
+    .nav-brand .geo { color: var(--accent); }
+    .nav-brand .icon {
+      width: 34px; height: 34px; background: var(--accent);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,.75); font-size: .9rem; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta {
+      background: var(--accent); color: var(--white);
+      border: none; border-radius: 8px;
+      padding: .5rem 1.2rem; font-size: .9rem; font-weight: 600;
+      transition: opacity .2s;
+    }
+    .nav-cta:hover { opacity: .88; }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 60%, #1a6faf 100%);
+      color: var(--white);
+      padding: 6rem 2.5rem 5rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(0,176,155,.15) 0%, transparent 65%);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(0,176,155,.2); border: 1px solid rgba(0,176,155,.4);
+      color: #7efcec; font-size: .8rem; font-weight: 600; letter-spacing: 1px;
+      padding: .35rem 1rem; border-radius: 20px; margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 1.2rem;
+      letter-spacing: -.5px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 1.15rem; max-width: 640px; margin: 0 auto 2.5rem;
+      color: rgba(255,255,255,.82); line-height: 1.75;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: var(--white);
+      border: none; border-radius: 10px;
+      padding: .85rem 2.2rem; font-size: 1rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0,176,155,.4);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,176,155,.5); }
+    .btn-outline {
+      background: transparent; color: var(--white);
+      border: 2px solid rgba(255,255,255,.5); border-radius: 10px;
+      padding: .85rem 2.2rem; font-size: 1rem; font-weight: 600;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,.08); }
+
+    /* Hero stats bar */
+    .hero-stats {
+      display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+      margin-top: 4rem; padding-top: 3rem;
+      border-top: 1px solid rgba(255,255,255,.15);
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); }
+    .stat-lbl { font-size: .82rem; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .5px; margin-top: .15rem; }
+
+    /* ── Feature Cards ───────────────────────────────────────── */
+    .section { padding: 5rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-header .eyebrow {
+      font-size: .82rem; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: .6rem;
+    }
+    .section-header h2 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--navy);
+    }
+    .section-header p {
+      color: var(--muted); max-width: 520px; margin: .75rem auto 0;
+    }
+
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 1.75rem; box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(13,35,64,.13); }
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1rem;
+    }
+    .feat-icon.blue   { background: #e8f0fd; }
+    .feat-icon.green  { background: #e6f8f5; }
+    .feat-icon.gold   { background: #fef6e4; }
+    .feat-icon.purple { background: #f0ecfa; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; color: var(--navy); }
+    .feature-card p  { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Tool Section ────────────────────────────────────────── */
+    #tool { background: var(--white); }
+    .tool-wrapper {
+      max-width: 1100px; margin: 0 auto; padding: 5rem 2.5rem;
+    }
+    .tool-layout {
+      display: grid; grid-template-columns: 380px 1fr; gap: 2.5rem; align-items: start;
+    }
+
+    /* Sidebar Form */
+    .form-panel {
+      background: var(--light); border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .form-panel-header {
+      background: var(--navy); color: var(--white);
+      padding: 1.25rem 1.5rem;
+    }
+    .form-panel-header h3 { font-size: 1rem; font-weight: 700; }
+    .form-panel-header p  { font-size: .82rem; color: rgba(255,255,255,.65); margin-top: .2rem; }
+
+    /* Progress steps */
+    .form-steps {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    }
+    .step-tab {
+      flex: 1; padding: .7rem .5rem; text-align: center;
+      font-size: .75rem; font-weight: 600; color: var(--muted);
+      border: none; background: var(--light); border-bottom: 3px solid transparent;
+      transition: all .2s; cursor: pointer;
+    }
+    .step-tab.active {
+      color: var(--sky); border-bottom-color: var(--sky);
+      background: var(--white);
+    }
+    .step-tab.done { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .form-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+    .field { display: flex; flex-direction: column; gap: .4rem; }
+    .field label {
+      font-size: .82rem; font-weight: 600; color: var(--navy);
+      display: flex; justify-content: space-between;
+    }
+    .field label span { font-weight: 400; color: var(--muted); }
+    .field input, .field select {
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: .6rem .9rem; font-size: .92rem; font-family: inherit;
+      color: var(--text); background: var(--white);
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .field input:focus, .field select:focus {
+      outline: none; border-color: var(--sky);
+    }
+    .field .hint { font-size: .78rem; color: var(--muted); }
+
+    /* Risk slider */
+    .risk-labels { display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); margin-top: .25rem; }
+    input[type=range] {
+      width: 100%; accent-color: var(--sky); cursor: pointer;
+    }
+    .risk-value-display {
+      text-align: center; font-weight: 700; font-size: 1.1rem;
+      color: var(--sky); margin: .25rem 0;
+    }
+
+    .form-action {
+      padding: 0 1.5rem 1.5rem;
+    }
+    .btn-run {
+      width: 100%; background: linear-gradient(135deg, var(--sky), var(--accent));
+      color: var(--white); border: none; border-radius: 10px;
+      padding: .9rem; font-size: 1rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(46,125,224,.35);
+      transition: opacity .2s, transform .2s;
+    }
+    .btn-run:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* Results Panel */
+    .results-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* Probability Gauge */
+    .prob-card {
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      color: var(--white); border-radius: var(--radius);
+      padding: 2rem; text-align: center;
+    }
+    .prob-card .card-label {
+      font-size: .82rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: rgba(255,255,255,.6); margin-bottom: 1rem;
+    }
+    .gauge-wrapper { position: relative; display: inline-block; }
+    .gauge-svg { width: 160px; height: 90px; overflow: visible; }
+    .gauge-bg { fill: none; stroke: rgba(255,255,255,.15); stroke-width: 14; stroke-linecap: round; }
+    .gauge-fill { fill: none; stroke: var(--accent); stroke-width: 14; stroke-linecap: round;
+      stroke-dasharray: 283; stroke-dashoffset: 70; /* ~75% */
+      transform-origin: center; transform: rotate(180deg);
+      transition: stroke-dashoffset 1s ease;
+    }
+    .gauge-pct {
+      position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+      font-size: 2.4rem; font-weight: 900; color: var(--white);
+    }
+    .gauge-pct small { font-size: 1rem; opacity: .7; }
+    .prob-status {
+      display: inline-block; margin-top: 1rem;
+      background: rgba(0,176,155,.25); border: 1px solid rgba(0,176,155,.5);
+      border-radius: 20px; padding: .3rem .9rem;
+      font-size: .85rem; font-weight: 600; color: #7efcec;
+    }
+
+    /* Chart Cards */
+    .chart-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .chart-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .chart-card-header h4 { font-size: .95rem; font-weight: 700; color: var(--navy); }
+    .chart-badge {
+      font-size: .75rem; font-weight: 600; padding: .25rem .7rem;
+      border-radius: 20px; background: #e8f0fd; color: var(--blue);
+    }
+
+    /* Portfolio Projection Chart placeholder */
+    .chart-area {
+      width: 100%; height: 200px;
+      background: linear-gradient(180deg, #f0f6ff 0%, #e8f0fd 100%);
+      border-radius: 8px; position: relative; overflow: hidden;
+    }
+    .chart-area svg { width: 100%; height: 100%; }
+    .chart-y-labels {
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: absolute; left: 8px; top: 12px; bottom: 24px;
+      font-size: .7rem; color: var(--muted);
+    }
+    .chart-x-labels {
+      display: flex; justify-content: space-between;
+      margin-top: .5rem; font-size: .72rem; color: var(--muted);
+    }
+    .chart-legend {
+      display: flex; gap: 1.25rem; margin-top: 1rem; flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* Monte Carlo chart */
+    .mc-area {
+      width: 100%; height: 170px;
+      background: #f8f9fc; border-radius: 8px; position: relative; overflow: hidden;
+    }
+    .mc-area svg { width: 100%; height: 100%; }
+
+    /* COL Map Card */
+    .col-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .col-card h4 { font-size: .95rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
+    .col-bar-list { display: flex; flex-direction: column; gap: .75rem; }
+    .col-bar-item { display: flex; flex-direction: column; gap: .25rem; }
+    .col-bar-label { display: flex; justify-content: space-between; font-size: .82rem; }
+    .col-bar-label .city { font-weight: 500; color: var(--text); }
+    .col-bar-label .val { color: var(--muted); }
+    .col-bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .col-bar-fill { height: 100%; border-radius: 4px; }
+
+    /* Two-col grid for charts */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+    /* Insights / Recommendations */
+    .insight-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .insight-card h4 { font-size: .95rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
+    .insight-list { display: flex; flex-direction: column; gap: .75rem; }
+    .insight-item {
+      display: flex; gap: .85rem; align-items: flex-start;
+      padding: .85rem; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--light);
+    }
+    .insight-icon {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .insight-body { flex: 1; }
+    .insight-body strong { font-size: .88rem; color: var(--navy); display: block; margin-bottom: .15rem; }
+    .insight-body p { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+    .insight-badge {
+      font-size: .72rem; font-weight: 700; padding: .2rem .6rem;
+      border-radius: 20px; white-space: nowrap; align-self: center;
+    }
+    .badge-high   { background: #fde8e8; color: var(--danger); }
+    .badge-medium { background: #fef3e2; color: var(--warn); }
+    .badge-low    { background: #e6f8f5; color: var(--success); }
+
+    /* Summary Metrics */
+    .metrics-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+    }
+    .metric-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 1.25rem;
+      box-shadow: var(--shadow); text-align: center;
+    }
+    .metric-card .m-label {
+      font-size: .75rem; font-weight: 600; letter-spacing: .5px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: .4rem;
+    }
+    .metric-card .m-value {
+      font-size: 1.5rem; font-weight: 800; color: var(--navy);
+    }
+    .metric-card .m-sub {
+      font-size: .78rem; color: var(--muted); margin-top: .2rem;
+    }
+    .metric-card .m-delta {
+      display: inline-block; margin-top: .4rem;
+      font-size: .78rem; font-weight: 700;
+      padding: .15rem .5rem; border-radius: 20px;
+    }
+    .delta-up   { background: #e6f8f5; color: var(--success); }
+    .delta-down { background: #fde8e8; color: var(--danger); }
+
+    /* ── How It Works ────────────────────────────────────────── */
+    .how-section {
+      background: var(--navy); color: var(--white);
+      padding: 5rem 2.5rem;
+    }
+    .how-inner { max-width: 1100px; margin: 0 auto; }
+    .how-header { text-align: center; margin-bottom: 3.5rem; }
+    .how-header .eyebrow { color: var(--accent); font-size: .82rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: .6rem; }
+    .how-header h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; }
+    .how-steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .how-step {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius); padding: 1.75rem;
+      position: relative;
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--accent); color: var(--white);
+      font-size: 1rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .how-step h3 { font-size: .95rem; font-weight: 700; margin-bottom: .5rem; }
+    .how-step p  { font-size: .85rem; color: rgba(255,255,255,.65); line-height: 1.6; }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      background: #081929; color: rgba(255,255,255,.5);
+      text-align: center; padding: 2rem;
+      font-size: .85rem;
+    }
+    footer strong { color: rgba(255,255,255,.8); }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .tool-layout { grid-template-columns: 1fr; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 540px) {
+      .metrics-row { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+    }
+  /* ── Error Banner ─────────────────────────────────────────── */
+  #errorBanner {
+    background: #fde8e8; border: 1px solid #f5c6cb;
+    color: var(--danger); border-radius: 8px;
+    padding: .85rem 1.25rem; font-size: .88rem;
+    margin-bottom: 1rem;
+  }
+  /* ── Zip city label ────────────────────────────────────────── */
+  .zip-city-label {
+    font-size: .76rem; color: var(--accent); margin-top: .2rem; min-height: 1em;
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">
+    <div class="icon">🌎</div>
+    <span><span class="geo">Geo</span>Retire</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#tool" class="active">Calculator</a></li>
+    <li><a href="#how">How It Works</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">
+    Get Started
+  </button>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-tag">Interactive Retirement Planner</div>
+  <h1>Plan Your Retirement<br>Based on <span>Where You Live</span></h1>
+  <p>
+    GeoRetire combines Monte Carlo simulation, time value of money modeling,
+    and location-based cost-of-living adjustments to estimate your true probability
+    of a successful retirement — wherever you plan to retire.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">
+      Run My Projection
+    </button>
+    <button class="btn-outline" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+      Learn How It Works
+    </button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">10,000+</div>
+      <div class="stat-lbl">Monte Carlo Simulations</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">41,000</div>
+      <div class="stat-lbl">US Zip Codes Covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">COL</div>
+      <div class="stat-lbl">Location-Adjusted Estimates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">Real</div>
+      <div class="stat-lbl">Behavioral Insights</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────── -->
+<div id="features">
+  <div class="section">
+    <div class="section-header">
+      <div class="eyebrow">Core Features</div>
+      <h2>Everything in One Retirement Toolkit</h2>
+      <p>Combining financial modeling, geographic data, and behavioral science.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feat-icon blue">📈</div>
+        <h3>Portfolio Projection</h3>
+        <p>Projects your future portfolio value using compounding growth, present value formulas, and risk-adjusted return assumptions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon green">🎲</div>
+        <h3>Monte Carlo Simulation</h3>
+        <p>Runs thousands of market-outcome scenarios to give you a realistic probability of funding retirement — not just a single optimistic number.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon gold">🗺️</div>
+        <h3>Geographic COL Adjustment</h3>
+        <p>Uses zip code data to adjust your required retirement income for local cost of living, housing, healthcare, and taxes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon purple">🧠</div>
+        <h3>Behavioral Finance Insights</h3>
+        <p>Identifies biases and blind spots in your plan — from loss aversion to sequence-of-returns risk — and suggests evidence-based corrections.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon blue">⚖️</div>
+        <h3>Risk-Return Tradeoffs</h3>
+        <p>Illustrates how adjusting your risk tolerance shifts projected outcomes and probability of success across different market environments.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon green">🎯</div>
+        <h3>Tailored Recommendations</h3>
+        <p>Generates personalized action items — contribution increases, location considerations, and allocation shifts — ranked by impact on success probability.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Calculator Tool ──────────────────────────────────────── -->
+<section id="tool">
+  <div class="tool-wrapper">
+    <div class="section-header">
+      <div class="eyebrow">Retirement Calculator</div>
+      <h2>Run Your Projection</h2>
+      <p>Fill in your details to get a personalized retirement probability analysis.</p>
+    </div>
+
+    <div class="tool-layout">
+
+      <!-- Left: Input Form -->
+      <div>
+        <div class="form-panel">
+          <div class="form-panel-header">
+            <h3>Your Information</h3>
+            <p>All inputs stay private in your browser.</p>
+          </div>
+
+          <!-- Step tabs -->
+          <div class="form-steps">
+            <button class="step-tab done">1 · Personal</button>
+            <button class="step-tab active">2 · Financial</button>
+            <button class="step-tab">3 · Location</button>
+          </div>
+
+          <div class="form-body">
+
+            <!-- Personal -->
+            <div class="field">
+              <label>Current Age <span>(years)</span></label>
+              <input type="number" id="inputCurrentAge" placeholder="e.g. 35" min="18" max="80" value="35" />
+            </div>
+            <div class="field">
+              <label>Target Retirement Age <span>(years)</span></label>
+              <input type="number" id="inputRetirementAge" placeholder="e.g. 65" min="40" max="90" value="65" />
+            </div>
+
+            <!-- Financial -->
+            <div class="field">
+              <label>Current Savings / Portfolio <span>(USD)</span></label>
+              <input type="text" id="inputSavings" placeholder="e.g. $150,000" value="$150,000" />
+              <span class="hint">Include 401(k), IRA, brokerage accounts.</span>
+            </div>
+            <div class="field">
+              <label>Annual Contributions <span>(USD/yr)</span></label>
+              <input type="text" id="inputContribution" placeholder="e.g. $18,000" value="$18,000" />
+              <span class="hint">Total yearly contributions across all accounts.</span>
+            </div>
+            <div class="field">
+              <label>Expected Annual Retirement Expenses <span>(USD/yr)</span></label>
+              <input type="text" id="inputExpenses" placeholder="e.g. $60,000" value="$60,000" />
+              <span class="hint">In today's dollars; adjusted for COL automatically.</span>
+            </div>
+
+            <!-- Risk tolerance -->
+            <div class="field">
+              <label>Risk Tolerance</label>
+              <div class="risk-value-display" id="riskLabel">Moderate (5)</div>
+              <input type="range" min="1" max="10" value="5" id="riskSlider"
+                oninput="updateRisk(this.value)" />
+              <div class="risk-labels">
+                <span>Conservative</span>
+                <span>Balanced</span>
+                <span>Aggressive</span>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="field">
+              <label>Current Zip Code</label>
+              <input type="text" id="inputCurrentZip" placeholder="e.g. 43210" maxlength="10" value="43210" />
+              <div class="zip-city-label" id="currentZipLabel"></div>
+            </div>
+            <div class="field">
+              <label>Target Retirement Zip Code</label>
+              <input type="text" id="inputTargetZip" placeholder="e.g. 33101 (Miami, FL)" maxlength="10" value="33101" />
+              <div class="zip-city-label" id="targetZipLabel"></div>
+              <span class="hint">Used to calculate location-adjusted income needs.</span>
+            </div>
+
+          </div>
+
+          <div class="form-action">
+            <button class="btn-run" onclick="runSimulation()">
+              ▶ Run Monte Carlo Simulation
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Results -->
+      <div class="results-panel">
+        <div id="errorBanner" style="display:none;"></div>
+
+        <!-- Probability of Success -->
+        <div class="prob-card">
+          <div class="card-label">Retirement Success Probability</div>
+          <div class="gauge-wrapper">
+            <svg class="gauge-svg" viewBox="0 0 200 100">
+              <path class="gauge-bg"
+                d="M 20 90 A 80 80 0 0 1 180 90"
+                stroke-dasharray="251" stroke-dashoffset="0" />
+              <path class="gauge-fill" id="gaugeFill"
+                d="M 20 90 A 80 80 0 0 1 180 90"
+                stroke-dasharray="251" stroke-dashoffset="63" />
+            </svg>
+            <div class="gauge-pct" id="gaugePct">75<small>%</small></div>
+          </div>
+          <div class="prob-status" id="probStatus">Good Shape</div>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="m-label">Projected Portfolio</div>
+            <div class="m-value" id="summaryProjected">$2.1M</div>
+            <div class="m-sub" id="summaryProjectedSub">at retirement (median)</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">COL-Adj. Income Need</div>
+            <div class="m-value" id="summaryColIncome">$60.0K</div>
+            <div class="m-sub" id="summaryColSub">per year in retirement</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">Success Probability</div>
+            <div class="m-value" id="summaryGap">—</div>
+            <div class="m-sub" id="summaryGapSub">run simulation to calculate</div>
+          </div>
+        </div>
+
+        <!-- Portfolio Projection Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h4>Portfolio Value Over Time</h4>
+            <span class="chart-badge">Time Value of Money</span>
+          </div>
+          <div class="chart-area" style="height:220px; background:none; padding:0;">
+            <canvas id="projectionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Monte Carlo + COL side-by-side -->
+        <div class="charts-grid">
+
+          <!-- Monte Carlo Distribution -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h4>Monte Carlo Distribution</h4>
+              <span class="chart-badge">10,000 Runs</span>
+            </div>
+            <div class="mc-area" style="height:170px; background:none;">
+              <canvas id="histogramChart"></canvas>
+            </div>
+          </div>
+
+          <!-- COL Comparison -->
+          <div class="col-card">
+            <h4>Cost-of-Living Comparison</h4>
+            <div class="col-bar-list">
+              <div class="col-bar-item">
+                <div class="col-bar-label">
+                  <span class="city">Miami, FL <small>(target)</small></span>
+                  <span class="val">Index: 123</span>
+                </div>
+                <div class="col-bar-track">
+                  <div class="col-bar-fill" style="width:82%;background:linear-gradient(90deg,#e74c3c,#f5a623)"></div>
+                </div>
+              </div>
+              <div class="col-bar-item">
+                <div class="col-bar-label">
+                  <span class="city">Columbus, OH <small>(current)</small></span>
+                  <span class="val">Index: 100</span>
+                </div>
+                <div class="col-bar-track">
+                  <div class="col-bar-fill" style="width:67%;background:#2e7de0"></div>
+                </div>
+              </div>
+              <div class="col-bar-item">
+                <div class="col-bar-label">
+                  <span class="city">Austin, TX</span>
+                  <span class="val">Index: 108</span>
+                </div>
+                <div class="col-bar-track">
+                  <div class="col-bar-fill" style="width:72%;background:#8b5cf6"></div>
+                </div>
+              </div>
+              <div class="col-bar-item">
+                <div class="col-bar-label">
+                  <span class="city">Phoenix, AZ</span>
+                  <span class="val">Index: 97</span>
+                </div>
+                <div class="col-bar-track">
+                  <div class="col-bar-fill" style="width:65%;background:#00b09b"></div>
+                </div>
+              </div>
+              <div class="col-bar-item">
+                <div class="col-bar-label">
+                  <span class="city">Asheville, NC</span>
+                  <span class="val">Index: 94</span>
+                </div>
+                <div class="col-bar-track">
+                  <div class="col-bar-fill" style="width:63%;background:#00b09b"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Behavioral Finance Insights -->
+        <div class="insight-card">
+          <h4>🧠 Behavioral Finance Insights &amp; Recommendations</h4>
+          <div class="insight-list">
+
+            <div class="insight-item">
+              <div class="insight-icon" style="background:#fde8e8;">⚠️</div>
+              <div class="insight-body">
+                <strong>Sequence-of-Returns Risk</strong>
+                <p>A market downturn in your first 5 years of retirement could reduce portfolio longevity by 12+ years. Consider a 2-year cash buffer or bond ladder at retirement.</p>
+              </div>
+              <span class="insight-badge badge-high">High Impact</span>
+            </div>
+
+            <div class="insight-item">
+              <div class="insight-icon" style="background:#fef3e2;">📍</div>
+              <div class="insight-body">
+                <strong>Location Optimization Opportunity</strong>
+                <p>Retiring in Phoenix, AZ (COL 97) vs. Miami, FL (COL 123) would raise your success probability by ~9 percentage points and reduce required savings by $180K.</p>
+              </div>
+              <span class="insight-badge badge-medium">Med Impact</span>
+            </div>
+
+            <div class="insight-item">
+              <div class="insight-icon" style="background:#e6f8f5;">💰</div>
+              <div class="insight-body">
+                <strong>Contribution Boost Opportunity</strong>
+                <p>Increasing annual contributions by $3,000/yr now (6% increase) raises your success probability from 75% to 84% through compound growth over 30 years.</p>
+              </div>
+              <span class="insight-badge badge-medium">Med Impact</span>
+            </div>
+
+            <div class="insight-item">
+              <div class="insight-icon" style="background:#f0ecfa;">📊</div>
+              <div class="insight-body">
+                <strong>Loss Aversion Check</strong>
+                <p>At Moderate risk (5), your allocation may be too conservative for a 30-year horizon. Shifting to Moderate-Aggressive (7) historically adds $280K in median terminal wealth.</p>
+              </div>
+              <span class="insight-badge badge-low">Consider</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────────── -->
+<section id="how" class="how-section">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="eyebrow">The Methodology</div>
+      <h2>How GeoRetire Works</h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h3>Input Your Profile</h3>
+        <p>Enter your age, retirement target, savings, contributions, risk tolerance, and zip codes for current and planned retirement location.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h3>COL Adjustment</h3>
+        <p>Your retirement zip code is mapped to a cost-of-living index to compute your true location-adjusted income requirement — not a national average.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h3>Portfolio Projection</h3>
+        <p>We apply time value of money, compound growth, and present value formulas to project your portfolio trajectory from now through retirement.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <h3>Monte Carlo Simulation</h3>
+        <p>10,000 market-outcome scenarios are simulated using historical return distributions to produce a realistic probability of success — not a single-path estimate.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">5</div>
+        <h3>Behavioral Insights</h3>
+        <p>Your results are analyzed through a behavioral finance lens to surface biases, risks, and ranked action items that maximize your probability of success.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────── -->
+<footer>
+  <strong>GeoRetire</strong> &mdash; Team 11 &middot; Fisher College of Business &middot; Finance Department<br>
+  <span style="font-size:.8rem;opacity:.6;">For educational purposes only. Not investment advice.</span>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   GeoRetire — Frontend Application Logic
+   Connects to FastAPI backend at http://localhost:8000/api
+   ══════════════════════════════════════════════════════════ */
+
+const API_BASE = 'http://localhost:8000/api';
+let projChart = null;
+let histChart = null;
+
+/* ── Risk slider label ─────────────────────────────────── */
+const RISK_LABELS = {
+  1:'Very Conservative (1)', 2:'Conservative (2)', 3:'Conservative-Mod (3)',
+  4:'Moderate-Cons (4)',     5:'Moderate (5)',       6:'Moderate-Bal (6)',
+  7:'Moderate-Aggr (7)',    8:'Aggressive (8)',     9:'Very Aggressive (9)',
+  10:'Maximum Growth (10)'
+};
+function updateRisk(v) {
+  document.getElementById('riskLabel').textContent = RISK_LABELS[v] || 'Moderate';
+}
+
+/* ── Currency utilities ────────────────────────────────── */
+function parseMoney(str) {
+  return parseFloat(String(str).replace(/[$,\s]/g, '')) || 0;
+}
+function formatM(v) {
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
+  return '$' + Math.round(v).toLocaleString();
+}
+function formatK(v) {
+  return '$' + (v / 1e3).toFixed(1) + 'K';
+}
+
+/* ── Error display ─────────────────────────────────────── */
+function showError(msg) {
+  const b = document.getElementById('errorBanner');
+  b.style.display = 'block';
+  b.textContent = '⚠ ' + msg;
+}
+function clearError() {
+  const b = document.getElementById('errorBanner');
+  b.style.display = 'none';
+  b.textContent = '';
+}
+
+/* ── Live zip code city lookup ─────────────────────────── */
+async function lookupZip(zip, labelId) {
+  const labelEl = document.getElementById(labelId);
+  if (!zip || zip.length < 5) { labelEl.textContent = ''; return; }
+  labelEl.textContent = '…';
+  try {
+    const r = await fetch(`${API_BASE}/city-from-zip/${zip.slice(0,5)}`);
+    if (r.ok) {
+      const d = await r.json();
+      labelEl.textContent = `📍 ${d.city}, ${d.state}` +
+        (d.col_index ? ` · COL index ${d.col_index.toFixed(0)}` : '');
+    } else {
+      labelEl.textContent = 'Zip not found';
+    }
+  } catch(e) {
+    labelEl.textContent = '';
+  }
+}
+
+document.getElementById('inputCurrentZip').addEventListener('blur', e =>
+  lookupZip(e.target.value, 'currentZipLabel'));
+document.getElementById('inputTargetZip').addEventListener('blur', e =>
+  lookupZip(e.target.value, 'targetZipLabel'));
+
+/* ── Main simulation call ──────────────────────────────── */
+async function runSimulation() {
+  clearError();
+  const btn = document.querySelector('.btn-run');
+  btn.textContent = '⏳ Simulating…';
+  btn.disabled = true;
+
+  const payload = {
+    current_age:          parseInt(document.getElementById('inputCurrentAge').value) || 35,
+    retirement_age:       parseInt(document.getElementById('inputRetirementAge').value) || 65,
+    life_expectancy:      90,
+    current_savings:      parseMoney(document.getElementById('inputSavings').value),
+    annual_contribution:  parseMoney(document.getElementById('inputContribution').value),
+    annual_expenses:      parseMoney(document.getElementById('inputExpenses').value),
+    risk_level:           parseInt(document.getElementById('riskSlider').value),
+    inflation:            0.03,
+    n_simulations:        1000,
+    current_zip:          document.getElementById('inputCurrentZip').value.trim(),
+    target_zip:           document.getElementById('inputTargetZip').value.trim(),
+  };
+
+  try {
+    const resp = await fetch(`${API_BASE}/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    renderResults(data, payload);
+  } catch(err) {
+    showError(err.message + ' — Make sure the backend server is running on port 8000.');
+  } finally {
+    btn.textContent = '▶ Run Monte Carlo Simulation';
+    btn.disabled = false;
+  }
+}
+
+/* ── Render all results ────────────────────────────────── */
+function renderResults(data, payload) {
+  renderGauge(data);
+  renderMetrics(data, payload);
+  renderProjectionChart(data);
+  renderHistogramChart(data);
+  renderCOLBars(data.col_info);
+  renderInsights(data.insights);
+}
+
+/* ── Probability gauge ─────────────────────────────────── */
+function renderGauge(data) {
+  const prob = Math.round(data.probability_of_success * 100);
+  // Gauge arc length = 251 (semi-circle)
+  const offset = 251 - (251 * prob / 100);
+  document.getElementById('gaugeFill').style.strokeDashoffset = offset;
+  document.getElementById('gaugePct').innerHTML = prob + '<small>%</small>';
+
+  const statusEl = document.getElementById('probStatus');
+  if (prob >= 80) {
+    statusEl.textContent = 'On Track';
+    statusEl.style.background = 'rgba(0,176,155,.25)';
+    statusEl.style.borderColor = 'rgba(0,176,155,.5)';
+    statusEl.style.color = '#7efcec';
+  } else if (prob >= 70) {
+    statusEl.textContent = 'Good Shape';
+    statusEl.style.background = 'rgba(245,166,35,.2)';
+    statusEl.style.borderColor = 'rgba(245,166,35,.5)';
+    statusEl.style.color = '#f5d88a';
+  } else {
+    statusEl.textContent = 'Needs Attention';
+    statusEl.style.background = 'rgba(231,76,60,.25)';
+    statusEl.style.borderColor = 'rgba(231,76,60,.5)';
+    statusEl.style.color = '#ff9090';
+  }
+}
+
+/* ── Summary metric cards ──────────────────────────────── */
+function renderMetrics(data, payload) {
+  const retAge = payload.retirement_age;
+  document.getElementById('summaryProjected').textContent = formatM(data.median_at_retirement);
+  document.getElementById('summaryProjectedSub').textContent = `at age ${retAge} (median)`;
+
+  if (data.col_info) {
+    document.getElementById('summaryColIncome').textContent = formatK(data.col_info.adjusted_expenses);
+    document.getElementById('summaryColSub').textContent =
+      `per year in ${data.col_info.target_city.split(',')[0]}`;
+  } else {
+    document.getElementById('summaryColIncome').textContent = formatK(payload.annual_expenses);
+    document.getElementById('summaryColSub').textContent = 'per year in retirement';
+  }
+
+  const prob = Math.round(data.probability_of_success * 100);
+  document.getElementById('summaryGap').textContent = prob + '%';
+  document.getElementById('summaryGapSub').textContent =
+    prob >= 80 ? 'probability of success ✓' :
+    prob >= 70 ? 'probability — approaching target' :
+    'probability — below 70% target';
+}
+
+/* ── Portfolio projection chart ────────────────────────── */
+function renderProjectionChart(data) {
+  const ctx = document.getElementById('projectionChart').getContext('2d');
+  if (projChart) { projChart.destroy(); projChart = null; }
+
+  // Thin the labels: show every Nth year for readability
+  const totalYears = data.years.length;
+  const step = Math.max(1, Math.floor(totalYears / 8));
+  const labels = data.years.map((y, i) => i % step === 0 ? 'Age ' + y : '');
+
+  projChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '90th Percentile',
+          data: data.percentile_90,
+          borderColor: 'rgba(46,125,224,0.35)',
+          backgroundColor: 'rgba(46,125,224,0.10)',
+          fill: '+1',
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 1,
+        },
+        {
+          label: 'Median (50th)',
+          data: data.percentile_50,
+          borderColor: '#2e7de0',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 2.5,
+        },
+        {
+          label: '10th Percentile',
+          data: data.percentile_10,
+          borderColor: '#e74c3c',
+          backgroundColor: 'transparent',
+          borderDash: [6, 3],
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 1.5,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 12, font: { size: 11 }, padding: 12 },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + formatM(ctx.parsed.y),
+          },
+        },
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: v => formatM(v),
+            maxTicksLimit: 5,
+            font: { size: 10 },
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+        },
+        x: {
+          ticks: {
+            maxRotation: 0,
+            font: { size: 10 },
+            autoSkip: false,
+          },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+/* ── Monte Carlo histogram ─────────────────────────────── */
+function renderHistogramChart(data) {
+  const ctx = document.getElementById('histogramChart').getContext('2d');
+  if (histChart) { histChart.destroy(); histChart = null; }
+
+  const colors = data.histogram_bins.map(b =>
+    b > data.success_threshold
+      ? 'rgba(0,176,155,0.75)'
+      : 'rgba(231,76,60,0.55)'
+  );
+
+  histChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.histogram_bins.map(b => formatM(b)),
+      datasets: [{
+        label: 'Simulations',
+        data: data.histogram_counts,
+        backgroundColor: colors,
+        borderWidth: 0,
+        barPercentage: 1.0,
+        categoryPercentage: 1.0,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: items => 'Final Portfolio: ' + items[0].label,
+            label: ctx => ctx.parsed.y + ' simulations',
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { maxTicksLimit: 5, font: { size: 9 } },
+          grid: { display: false },
+        },
+        y: { display: false },
+      },
+    },
+  });
+}
+
+/* ── COL bar chart ─────────────────────────────────────── */
+function renderCOLBars(col) {
+  const list = document.querySelector('.col-bar-list');
+  if (!col) {
+    list.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:.5rem 0;">Run the simulation with zip codes to see cost-of-living comparison.</p>';
+    return;
+  }
+
+  const maxIndex = Math.max(col.current_col_index, col.target_col_index, 130);
+  const cities = [
+    {
+      label: col.target_city + ' (target)',
+      index: col.target_col_index,
+      color: col.target_col_index > col.current_col_index
+        ? 'linear-gradient(90deg,#e74c3c,#f5a623)'
+        : 'linear-gradient(90deg,#00b09b,#2e7de0)',
+    },
+    {
+      label: col.current_city + ' (current)',
+      index: col.current_col_index,
+      color: '#2e7de0',
+    },
+  ];
+
+  list.innerHTML = cities.map(item => `
+    <div class="col-bar-item">
+      <div class="col-bar-label">
+        <span class="city">${item.label}</span>
+        <span class="val">Index: ${item.index.toFixed(0)}</span>
+      </div>
+      <div class="col-bar-track">
+        <div class="col-bar-fill" style="width:${(item.index/maxIndex*100).toFixed(1)}%;background:${item.color}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Behavioral finance insights ───────────────────────── */
+function renderInsights(insights) {
+  const list = document.querySelector('.insight-list');
+  if (!insights || insights.length === 0) {
+    list.innerHTML = '<p style="font-size:.82rem;color:var(--muted)">No insights available. Run the simulation first.</p>';
+    return;
+  }
+
+  const badgeClass = { high: 'badge-high', medium: 'badge-medium', low: 'badge-low' };
+  const badgeLabel = { high: 'High Impact', medium: 'Med Impact', low: 'Consider' };
+
+  list.innerHTML = insights.map(ins => `
+    <div class="insight-item">
+      <div class="insight-icon" style="background:${
+        ins.impact === 'high' ? '#fde8e8' :
+        ins.impact === 'medium' ? '#fef3e2' : '#e6f8f5'
+      }">${ins.icon}</div>
+      <div class="insight-body">
+        <strong>${ins.title}</strong>
+        <p>${ins.body}</p>
+      </div>
+      <span class="insight-badge ${badgeClass[ins.impact]}">${badgeLabel[ins.impact]}</span>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
