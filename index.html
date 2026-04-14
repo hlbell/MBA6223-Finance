@@ -343,7 +343,7 @@
     .insight-card {
       background: var(--white); border-radius: var(--radius);
       border: 1px solid var(--border); padding: 1.5rem;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow); grid-column: 1 / -1;
     }
     .insight-card h4 { font-size: .95rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
     .insight-list { display: flex; flex-direction: column; gap: .75rem; }
@@ -756,8 +756,11 @@
 
         </div>
 
-        <!-- Behavioral Finance Insights -->
-        <div class="insight-card">
+
+      </div>
+
+      <!-- Behavioral Finance Insights — spans both columns -->
+      <div class="insight-card">
           <h4>🧠 Behavioral Finance Insights &amp; Recommendations</h4>
           <div class="insight-list">
 
@@ -800,7 +803,6 @@
           </div>
         </div>
 
-      </div>
     </div>
   </div>
 </section>
