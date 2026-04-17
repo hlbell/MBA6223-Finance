@@ -169,6 +169,7 @@
 
     /* ── Tool Section ────────────────────────────────────────── */
     #tool { background: var(--white); scroll-margin-top: 64px; }
+    @media (max-width: 600px) { #tool { scroll-margin-top: 56px; } }
     .tool-wrapper {
       max-width: 1100px; margin: 0 auto; padding: 5rem 2.5rem;
     }
@@ -434,15 +435,61 @@
     footer strong { color: rgba(255,255,255,.8); }
 
     /* ── Responsive ──────────────────────────────────────────── */
+    /* ── Tablet (≤900px) ─────────────────────────────────────── */
     @media (max-width: 900px) {
-      .tool-layout { grid-template-columns: 1fr; }
-      .charts-grid { grid-template-columns: 1fr; }
-      .metrics-row { grid-template-columns: repeat(2, 1fr); }
-      .nav-links { display: none; }
+      .tool-layout   { grid-template-columns: 1fr; }
+      .charts-grid   { grid-template-columns: 1fr; }
+      .metrics-row   { grid-template-columns: repeat(2, 1fr); }
+      .how-steps     { grid-template-columns: repeat(3, 1fr); }
+      .tool-wrapper  { padding: 3rem 1.5rem; }
+      .how-section   { padding: 3rem 1.5rem; }
+      .section       { padding: 3rem 1.5rem; }
     }
-    @media (max-width: 540px) {
+
+    /* ── Mobile (≤600px) ─────────────────────────────────────── */
+    @media (max-width: 600px) {
+      /* Nav */
+      nav { height: 56px; }
+      .nav-brand { font-size: 1.4rem; }
+      .nav-brand .icon { width: 36px; height: 36px; font-size: 1.1rem; }
+
+      /* Hero */
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      .hero-stats { flex-direction: column; gap: 1rem; align-items: center; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .hero-actions .btn-primary,
+      .hero-actions .btn-outline { width: 100%; max-width: 280px; text-align: center; }
+
+      /* How It Works */
+      .how-steps { grid-template-columns: 1fr; }
+      .how-section { padding: 2.5rem 1.25rem; }
+
+      /* Calculator */
+      .tool-wrapper  { padding: 2rem 1rem; }
+      .form-body     { padding: 1rem; }
+      .form-action   { padding: 1rem; }
+
+      /* Metrics */
       .metrics-row { grid-template-columns: 1fr; }
-      .hero-stats { gap: 1.5rem; }
+
+      /* Scenario buckets */
+      .scenario-buckets { gap: .35rem; flex-wrap: wrap; justify-content: center; }
+      .scenario-person svg { width: 28px; height: 28px; }
+
+      /* Insight items */
+      .insight-item { flex-wrap: wrap; }
+      .insight-badge { align-self: flex-start; margin-top: .25rem; }
+
+      /* COL bars */
+      .col-bar-label { flex-direction: column; gap: .1rem; }
+
+      /* Charts */
+      .chart-card { padding: 1rem; }
+      .col-card   { padding: 1rem; }
+
+      /* Section padding */
+      .section  { padding: 2rem 1rem; }
+      .how-inner { padding: 0; }
     }
   /* ── Error Banner ─────────────────────────────────────────── */
   #errorBanner {
