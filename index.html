@@ -39,21 +39,21 @@
     nav {
       position: sticky; top: 0; z-index: 100;
       background: var(--navy);
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: center;
       padding: 0 2.5rem;
       height: 64px;
       box-shadow: 0 2px 16px rgba(0,0,0,.25);
     }
     .nav-brand {
-      display: flex; align-items: center; gap: .6rem;
-      font-size: 1.35rem; font-weight: 700; color: var(--white);
+      display: flex; align-items: center; gap: .85rem;
+      font-size: 1.95rem; font-weight: 700; color: var(--white);
       letter-spacing: -.3px;
     }
     .nav-brand .geo { color: var(--accent); }
     .nav-brand .icon {
-      width: 34px; height: 34px; background: var(--accent);
-      border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
+      width: 48px; height: 48px; background: var(--accent);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.55rem;
     }
     .nav-links {
       display: flex; gap: 2rem; list-style: none;
@@ -93,7 +93,7 @@
       text-transform: uppercase;
     }
     .hero h1 {
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 800; line-height: 1.15; margin-bottom: 1.2rem;
       letter-spacing: -.5px;
     }
@@ -145,7 +145,7 @@
     }
 
     .feature-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
     }
     .feature-card {
@@ -398,21 +398,21 @@
 
     /* ── How It Works ────────────────────────────────────────── */
     .how-section {
-      background: var(--navy); color: var(--white);
+      background: var(--light); color: var(--text);
       padding: 5rem 2.5rem;
     }
     .how-inner { max-width: 1100px; margin: 0 auto; }
     .how-header { text-align: center; margin-bottom: 3.5rem; }
     .how-header .eyebrow { color: var(--accent); font-size: .82rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: .6rem; }
-    .how-header h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; }
+    .how-header h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--navy); }
     .how-steps {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
     }
     .how-step {
-      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      background: var(--white); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 1.75rem;
-      position: relative;
+      position: relative; box-shadow: var(--shadow);
     }
     .step-num {
       width: 40px; height: 40px; border-radius: 10px;
@@ -421,8 +421,8 @@
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 1rem;
     }
-    .how-step h3 { font-size: .95rem; font-weight: 700; margin-bottom: .5rem; }
-    .how-step p  { font-size: .85rem; color: rgba(255,255,255,.65); line-height: 1.6; }
+    .how-step h3 { font-size: .95rem; font-weight: 700; margin-bottom: .5rem; color: var(--navy); }
+    .how-step p  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
 
     /* ── Footer ──────────────────────────────────────────────── */
     footer {
@@ -465,14 +465,6 @@
     <div class="icon">🌎</div>
     <span><span class="geo">Geo</span>Retire</span>
   </div>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#tool" class="active">Calculator</a></li>
-    <li><a href="#how">How It Works</a></li>
-  </ul>
-  <button class="nav-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">
-    Get Started
-  </button>
 </nav>
 
 <!-- ── Hero ────────────────────────────────────────────────── -->
@@ -510,48 +502,42 @@
   </div>
 </section>
 
-<!-- ── Features ─────────────────────────────────────────────── -->
-<div id="features">
-  <div class="section">
-    <div class="section-header">
-      <div class="eyebrow">Core Features</div>
-      <h2>Everything in One Retirement Toolkit</h2>
-      <p>Combining financial modeling, geographic data, and behavioral science.</p>
+<!-- ── How It Works ─────────────────────────────────────────── -->
+<section id="how" class="how-section">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="eyebrow">What GeoRetire Does</div>
+      <h2>How GeoRetire Works</h2>
     </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="feat-icon blue">📈</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h3>Input Your Profile</h3>
+        <p>Enter your age, retirement target, savings, contributions, risk tolerance, and zip codes for current and planned retirement location.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h3>COL Adjustment</h3>
+        <p>Your retirement zip code is mapped to a cost-of-living index to compute your true location-adjusted income requirement — not a national average.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
         <h3>Portfolio Projection</h3>
-        <p>Projects your future portfolio value using compounding growth, present value formulas, and risk-adjusted return assumptions.</p>
+        <p>We apply time value of money, compound growth, and present value formulas to project your portfolio trajectory from now through retirement.</p>
       </div>
-      <div class="feature-card">
-        <div class="feat-icon green">🎲</div>
+      <div class="how-step">
+        <div class="step-num">4</div>
         <h3>Monte Carlo Simulation</h3>
-        <p>Runs thousands of market-outcome scenarios to give you a realistic probability of funding retirement — not just a single optimistic number.</p>
+        <p>10,000 market-outcome scenarios are simulated using historical return distributions to produce a realistic probability of success — not a single-path estimate.</p>
       </div>
-      <div class="feature-card">
-        <div class="feat-icon gold">🗺️</div>
-        <h3>Geographic COL Adjustment</h3>
-        <p>Uses zip code data to adjust your required retirement income for local cost of living, housing, healthcare, and taxes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feat-icon purple">🧠</div>
-        <h3>Behavioral Finance Insights</h3>
-        <p>Identifies biases and blind spots in your plan — from loss aversion to sequence-of-returns risk — and suggests evidence-based corrections.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feat-icon blue">⚖️</div>
-        <h3>Risk-Return Tradeoffs</h3>
-        <p>Illustrates how adjusting your risk tolerance shifts projected outcomes and probability of success across different market environments.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feat-icon green">🎯</div>
-        <h3>Tailored Recommendations</h3>
-        <p>Generates personalized action items — contribution increases, location considerations, and allocation shifts — ranked by impact on success probability.</p>
+      <div class="how-step">
+        <div class="step-num">5</div>
+        <h3>Behavioral Insights</h3>
+        <p>Your results are analyzed through a behavioral finance lens to surface biases, risks, and ranked action items that maximize your probability of success.</p>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ── Calculator Tool ──────────────────────────────────────── -->
 <section id="tool">
@@ -803,43 +789,6 @@
           </div>
         </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- ── How It Works ─────────────────────────────────────────── -->
-<section id="how" class="how-section">
-  <div class="how-inner">
-    <div class="how-header">
-      <div class="eyebrow">The Methodology</div>
-      <h2>How GeoRetire Works</h2>
-    </div>
-    <div class="how-steps">
-      <div class="how-step">
-        <div class="step-num">1</div>
-        <h3>Input Your Profile</h3>
-        <p>Enter your age, retirement target, savings, contributions, risk tolerance, and zip codes for current and planned retirement location.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-num">2</div>
-        <h3>COL Adjustment</h3>
-        <p>Your retirement zip code is mapped to a cost-of-living index to compute your true location-adjusted income requirement — not a national average.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-num">3</div>
-        <h3>Portfolio Projection</h3>
-        <p>We apply time value of money, compound growth, and present value formulas to project your portfolio trajectory from now through retirement.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-num">4</div>
-        <h3>Monte Carlo Simulation</h3>
-        <p>10,000 market-outcome scenarios are simulated using historical return distributions to produce a realistic probability of success — not a single-path estimate.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-num">5</div>
-        <h3>Behavioral Insights</h3>
-        <p>Your results are analyzed through a behavioral finance lens to surface biases, risks, and ranked action items that maximize your probability of success.</p>
-      </div>
     </div>
   </div>
 </section>
