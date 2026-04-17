@@ -62,14 +62,12 @@ async def simulate(req: SimulationRequest):
         current_result, target_result = await lookup_both_zips(
             req.current_zip, req.target_zip
         )
-        if (
-            current_result is not None
-            and target_result is not None
-            and current_result[2] is not None
-            and target_result[2] is not None
-        ):
+        if current_result is not None and target_result is not None:
             c_city, c_state, c_col = current_result
             t_city, t_state, t_col = target_result
+            # Fall back to baseline (100) when Teleport/table doesn't cover the city
+            c_col = c_col if c_col is not None else 100.0
+            t_col = t_col if t_col is not None else 100.0
             col_ratio = t_col / c_col if c_col > 0 else 1.0
             adjusted_expenses = req.annual_expenses * col_ratio
             col_info = COLInfo(
@@ -139,6 +137,9 @@ async def simulate(req: SimulationRequest):
 
 # ── Serve frontend static files ──────────────────────────────────────
 # Mount AFTER API routes so /api/* is matched first.
-# The parent directory (../) contains index.html.
-_frontend_dir = os.path.join(os.path.dirname(__file__), "..")
+# When frozen by PyInstaller, static files are extracted to sys._MEIPASS.
+if getattr(sys, "frozen", False):
+    _frontend_dir = sys._MEIPASS
+else:
+    _frontend_dir = os.path.join(os.path.dirname(__file__), "..")
 app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="static")
