@@ -685,7 +685,7 @@
           <!-- COL Comparison -->
           <div class="col-card">
             <h4>Cost-of-Living Comparison</h4>
-            <div class="col-bar-list">
+            <div class="col-bar-list" id="colBarList">
               <div class="col-bar-item">
                 <div class="col-bar-label">
                   <span class="city">Miami, FL <small>(target)</small></span>
@@ -858,10 +858,35 @@ async function lookupZip(zip, labelId) {
   }
 }
 
-document.getElementById('inputCurrentZip').addEventListener('blur', e =>
-  lookupZip(e.target.value, 'currentZipLabel'));
-document.getElementById('inputTargetZip').addEventListener('blur', e =>
-  lookupZip(e.target.value, 'targetZipLabel'));
+async function updateCOLBars() {
+  const currentZip = document.getElementById('inputCurrentZip').value.trim();
+  const targetZip  = document.getElementById('inputTargetZip').value.trim();
+  if (currentZip.length < 5 || targetZip.length < 5) return;
+  try {
+    const [rCurrent, rTarget] = await Promise.all([
+      fetch(`${API_BASE}/city-from-zip/${currentZip.slice(0,5)}`),
+      fetch(`${API_BASE}/city-from-zip/${targetZip.slice(0,5)}`),
+    ]);
+    if (!rCurrent.ok || !rTarget.ok) return;
+    const [dCurrent, dTarget] = await Promise.all([rCurrent.json(), rTarget.json()]);
+    if (!dCurrent.col_index || !dTarget.col_index) return;
+    renderCOLBars({
+      current_city:      `${dCurrent.city}, ${dCurrent.state}`,
+      current_col_index: dCurrent.col_index,
+      target_city:       `${dTarget.city}, ${dTarget.state}`,
+      target_col_index:  dTarget.col_index,
+    });
+  } catch(e) { /* silently ignore */ }
+}
+
+document.getElementById('inputCurrentZip').addEventListener('blur', e => {
+  lookupZip(e.target.value, 'currentZipLabel');
+  updateCOLBars();
+});
+document.getElementById('inputTargetZip').addEventListener('blur', e => {
+  lookupZip(e.target.value, 'targetZipLabel');
+  updateCOLBars();
+});
 
 /* ── Main simulation call ──────────────────────────────── */
 async function runSimulation() {
@@ -908,12 +933,12 @@ async function runSimulation() {
 
 /* ── Render all results ────────────────────────────────── */
 function renderResults(data, payload) {
-  renderGauge(data);
-  renderMetrics(data, payload);
-  renderProjectionChart(data);
-  renderHistogramChart(data);
-  renderCOLBars(data.col_info);
-  renderInsights(data.insights);
+  try { renderGauge(data); }            catch(e) { console.error('gauge', e); }
+  try { renderMetrics(data, payload); } catch(e) { console.error('metrics', e); }
+  try { renderProjectionChart(data); }  catch(e) { console.error('projChart', e); }
+  try { renderHistogramChart(data); }   catch(e) { console.error('histChart', e); }
+  try { renderCOLBars(data.col_info); } catch(e) { console.error('colBars', e); }
+  try { renderInsights(data.insights); }catch(e) { console.error('insights', e); }
 }
 
 /* ── Probability gauge ─────────────────────────────────── */
@@ -1112,7 +1137,7 @@ function renderHistogramChart(data) {
 
 /* ── COL bar chart ─────────────────────────────────────── */
 function renderCOLBars(col) {
-  const list = document.querySelector('.col-bar-list');
+  const list = document.getElementById('colBarList');
   if (!col) {
     list.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:.5rem 0;">Run the simulation with zip codes to see cost-of-living comparison.</p>';
     return;
