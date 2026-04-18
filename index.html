@@ -176,6 +176,10 @@
     .tool-layout {
       display: grid; grid-template-columns: 380px 1fr; gap: 2.5rem; align-items: start;
     }
+    .tool-layout--centered {
+      grid-template-columns: 380px; justify-content: center;
+    }
+    .tool-layout--centered > div + div { display: none; }
 
     /* Sidebar Form */
     .form-panel {
@@ -245,6 +249,9 @@
       transition: opacity .2s, transform .2s;
     }
     .btn-run:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* Suggested (placeholder-style) input values */
+    input.suggested { color: #aaa; }
 
     /* Results Panel */
     .results-panel { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -596,7 +603,7 @@
       <p>Fill in your details to get a personalized retirement probability analysis.</p>
     </div>
 
-    <div class="tool-layout">
+    <div class="tool-layout tool-layout--centered" id="toolLayout">
 
       <!-- Left: Input Form -->
       <div>
@@ -611,28 +618,33 @@
             <!-- Personal -->
             <div class="field">
               <label>Current Age <span>(years)</span></label>
-              <input type="number" id="inputCurrentAge" placeholder="e.g. 35" min="18" max="80" value="35" />
+              <input type="number" id="inputCurrentAge" placeholder="e.g. 35" min="18" max="80" />
+              <span id="currentAgeError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter a valid current age between 20 and 49.</span>
             </div>
             <div class="field">
               <label>Target Retirement Age <span>(years)</span></label>
-              <input type="number" id="inputRetirementAge" placeholder="e.g. 65" min="40" max="90" value="65" />
+              <input type="number" id="inputRetirementAge" placeholder="e.g. 65" min="40" max="90" />
+              <span id="retirementAgeError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter a valid retirement age between 61 and 67.</span>
             </div>
 
             <!-- Financial -->
             <div class="field">
               <label>Current Savings / Portfolio <span>(USD)</span></label>
-              <input type="text" id="inputSavings" placeholder="e.g. $150,000" value="$150,000" />
+              <input type="text" id="inputSavings" placeholder="e.g. $150,000" />
               <span class="hint">Include 401(k), IRA, brokerage accounts.</span>
+              <span id="savingsError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than 0 USD.</span>
             </div>
             <div class="field">
               <label>Annual Contributions <span>(USD/yr)</span></label>
-              <input type="text" id="inputContribution" placeholder="e.g. $18,000" value="$18,000" />
+              <input type="text" id="inputContribution" placeholder="e.g. $18,000" />
               <span class="hint">Total yearly contributions across all accounts.</span>
+              <span id="contributionError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than 0 USD.</span>
             </div>
             <div class="field">
               <label>Expected Annual Retirement Expenses <span>(USD/yr)</span></label>
-              <input type="text" id="inputExpenses" placeholder="e.g. $60,000" value="$60,000" />
+              <input type="text" id="inputExpenses" placeholder="e.g. $60,000" />
               <span class="hint">In today's dollars; adjusted for COL automatically.</span>
+              <span id="expensesError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than the current savings.</span>
             </div>
 
             <!-- Risk tolerance -->
@@ -651,13 +663,15 @@
             <!-- Location -->
             <div class="field">
               <label>Current Zip Code</label>
-              <input type="text" id="inputCurrentZip" placeholder="e.g. 43210" maxlength="10" value="43210" />
+              <input type="text" id="inputCurrentZip" placeholder="e.g. 43210" maxlength="10" />
               <div class="zip-city-label" id="currentZipLabel"></div>
+              <span id="currentZipError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter a valid zip code.</span>
             </div>
             <div class="field">
               <label>Target Retirement Zip Code</label>
-              <input type="text" id="inputTargetZip" placeholder="e.g. 33101 (Miami, FL)" maxlength="10" value="33101" />
+              <input type="text" id="inputTargetZip" placeholder="e.g. 33101 (Miami, FL)" maxlength="10" />
               <div class="zip-city-label" id="targetZipLabel"></div>
+              <span id="targetZipError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter a valid zip code.</span>
               <span class="hint">Used to calculate location-adjusted income needs.</span>
             </div>
 
@@ -674,6 +688,8 @@
       <!-- Right: Results -->
       <div class="results-panel">
         <div id="errorBanner" style="display:none;"></div>
+
+        <div id="resultsContent" style="display:none;">
 
         <!-- Probability of Success -->
         <div class="prob-card">
@@ -783,11 +799,12 @@
 
         </div>
 
+        </div><!-- /resultsContent -->
 
       </div>
 
       <!-- Behavioral Finance Insights — spans both columns -->
-      <div class="insight-card">
+      <div class="insight-card" id="insightCard" style="display:none;">
           <h4>🧠 Behavioral Finance Insights &amp; Recommendations</h4>
           <div class="insight-list">
 
@@ -850,6 +867,39 @@ const API_BASE = 'http://localhost:8000/api';
 let projChart = null;
 let histChart = null;
 
+/* ── Suggested (placeholder-style) input defaults ──────── */
+const SUGGESTED_DEFAULTS = {
+  inputCurrentAge:    '35',
+  inputRetirementAge: '65',
+  inputSavings:       '$50,000',
+  inputContribution:  '$18,000',
+  inputExpenses:      '$60,000',
+  inputCurrentZip:    '43210',
+  inputTargetZip:     '33101',
+};
+
+(function initSuggestedInputs() {
+  Object.entries(SUGGESTED_DEFAULTS).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = val;
+    el.classList.add('suggested');
+    el.addEventListener('focus', () => {
+      if (el.classList.contains('suggested')) {
+        el.value = '';
+        el.classList.remove('suggested');
+      }
+    });
+    el.addEventListener('input', () => el.classList.remove('suggested'));
+    el.addEventListener('blur', () => {
+      if (el.value.trim() === '') {
+        el.value = val;
+        el.classList.add('suggested');
+      }
+    });
+  });
+})();
+
 /* ── Risk slider label ─────────────────────────────────── */
 const RISK_LABELS = {
   1:'Very Conservative (1)', 2:'Conservative (2)', 3:'Conservative-Mod (3)',
@@ -865,6 +915,21 @@ function updateRisk(v) {
 function parseMoney(str) {
   return parseFloat(String(str).replace(/[$,\s]/g, '')) || 0;
 }
+function formatUSD(val) {
+  if (!val || isNaN(val)) return '';
+  return '$' + Math.round(val).toLocaleString('en-US');
+}
+(function initMoneyInputs() {
+  ['inputSavings', 'inputContribution', 'inputExpenses'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('blur', () => {
+      if (el.classList.contains('suggested')) return;
+      const val = parseMoney(el.value);
+      if (val > 0) el.value = formatUSD(val);
+    });
+  });
+})();
 function formatM(v) {
   if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
   if (v >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
@@ -938,13 +1003,70 @@ document.getElementById('inputTargetZip').addEventListener('blur', e => {
 /* ── Main simulation call ──────────────────────────────── */
 async function runSimulation() {
   clearError();
+
+  const currentAge = parseInt(document.getElementById('inputCurrentAge').value) || 35;
+  const currentAgeError = document.getElementById('currentAgeError');
+  if (currentAge < 20 || currentAge > 49) {
+    currentAgeError.style.display = 'block';
+    return;
+  }
+  currentAgeError.style.display = 'none';
+
+  const currentSavings = parseMoney(document.getElementById('inputSavings').value);
+  const savingsError = document.getElementById('savingsError');
+  if (currentSavings <= 0) {
+    savingsError.style.display = 'block';
+    return;
+  }
+  savingsError.style.display = 'none';
+
+  const annualContribution = parseMoney(document.getElementById('inputContribution').value);
+  const contributionError = document.getElementById('contributionError');
+  if (annualContribution <= 0) {
+    contributionError.style.display = 'block';
+    return;
+  }
+  contributionError.style.display = 'none';
+
+  const annualExpenses = parseMoney(document.getElementById('inputExpenses').value);
+  const expensesError = document.getElementById('expensesError');
+  if (annualExpenses <= currentSavings) {
+    expensesError.style.display = 'block';
+    return;
+  }
+  expensesError.style.display = 'none';
+
+  const currentZip = document.getElementById('inputCurrentZip').value.trim();
+  const currentZipError = document.getElementById('currentZipError');
+  if (!/^\d{5}$/.test(currentZip)) {
+    currentZipError.style.display = 'block';
+    return;
+  }
+  currentZipError.style.display = 'none';
+
+  const targetZip = document.getElementById('inputTargetZip').value.trim();
+  const targetZipError = document.getElementById('targetZipError');
+  if (!/^\d{5}$/.test(targetZip)) {
+    targetZipError.style.display = 'block';
+    return;
+  }
+  targetZipError.style.display = 'none';
+
+  const retirementAge = parseInt(document.getElementById('inputRetirementAge').value) || 65;
+  const retirementAgeError = document.getElementById('retirementAgeError');
+  if (retirementAge < 61 || retirementAge > 67) {
+    retirementAgeError.style.display = 'block';
+    return;
+  }
+  retirementAgeError.style.display = 'none';
+
   const btn = document.querySelector('.btn-run');
   btn.textContent = '⏳ Simulating…';
   btn.disabled = true;
 
   const payload = {
-    current_age:          parseInt(document.getElementById('inputCurrentAge').value) || 35,
-    retirement_age:       parseInt(document.getElementById('inputRetirementAge').value) || 65,
+    current_age:          currentAge,
+    retirement_age:       retirementAge,
     life_expectancy:      90,
     current_savings:      parseMoney(document.getElementById('inputSavings').value),
     annual_contribution:  parseMoney(document.getElementById('inputContribution').value),
@@ -986,6 +1108,9 @@ function renderResults(data, payload) {
   try { renderHistogramChart(data); }   catch(e) { console.error('histChart', e); }
   try { renderCOLBars(data.col_info); } catch(e) { console.error('colBars', e); }
   try { renderInsights(data.insights); }catch(e) { console.error('insights', e); }
+  document.getElementById('toolLayout').classList.remove('tool-layout--centered');
+  document.getElementById('resultsContent').style.display = '';
+  document.getElementById('insightCard').style.display = '';
 }
 
 /* ── Probability gauge ─────────────────────────────────── */
