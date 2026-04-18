@@ -7,6 +7,58 @@
   <style>
     /* ── Reset & Base ────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Login Page ──────────────────────────────────────────── */
+    #loginPage {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 60%, #1a6b8c 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    #loginPage.hidden { display: none; }
+    .login-card {
+      background: var(--white); border-radius: 18px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.35);
+      padding: 2.75rem 2.5rem 2.5rem;
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+    }
+    .login-brand {
+      display: flex; flex-direction: column; align-items: center; gap: .75rem;
+    }
+    .login-brand .icon {
+      width: 68px; height: 68px; background: var(--accent);
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+    }
+    .login-brand h1 {
+      font-size: 2rem; font-weight: 800; color: var(--navy); letter-spacing: -.4px;
+    }
+    .login-brand h1 span { color: var(--accent); }
+    .login-brand p { font-size: .88rem; color: var(--muted); text-align: center; }
+    .login-fields { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+    .login-fields label {
+      font-size: .82rem; font-weight: 600; color: var(--navy);
+      display: block; margin-bottom: .3rem;
+    }
+    .login-fields input {
+      width: 100%; padding: .7rem 1rem; border: 1.5px solid var(--border, #d8e0ef);
+      border-radius: 8px; font-size: .95rem; color: var(--text);
+      outline: none; transition: border-color .2s;
+    }
+    .login-fields input:focus { border-color: var(--sky); }
+    #loginError {
+      display: none; font-size: .82rem; color: var(--danger);
+      text-align: center; margin-top: -.5rem;
+    }
+    .btn-login {
+      width: 100%; padding: .85rem; background: linear-gradient(135deg, var(--sky), var(--accent));
+      color: var(--white); border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: opacity .2s, transform .2s;
+    }
+    .btn-login:hover { opacity: .9; transform: translateY(-1px); }
+    #appWrapper { display: none; }
     :root {
       --navy:   #0d2340;
       --blue:   #1a4b8c;
@@ -513,6 +565,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
+
+<!-- ── Login Page ───────────────────────────────────────────── -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="icon">🌎</div>
+      <h1><span>Geo</span>Retire</h1>
+      <p>Retirement planning powered by location intelligence</p>
+    </div>
+    <div class="login-fields">
+      <div>
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username" />
+      </div>
+      <div>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+      </div>
+      <span id="loginError">Incorrect username or password.</span>
+    </div>
+    <button class="btn-login" onclick="handleLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ── App ──────────────────────────────────────────────────── -->
+<div id="appWrapper">
 
 <!-- ── Navigation ──────────────────────────────────────────── -->
 <nav>
@@ -1380,6 +1458,33 @@ function renderInsights(insights) {
 
 // Initialise scenario buckets with default 75% on page load
 renderGauge({ probability_of_success: 0.75 });
+
+/* ── Login ─────────────────────────────────────────────────── */
+function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl  = document.getElementById('loginError');
+
+  if (username === 'admin' && password === 'georetire2025') {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('appWrapper').style.display = '';
+    errorEl.style.display = 'none';
+  } else {
+    errorEl.style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginPassword').focus();
+  }
+}
+
+// Allow pressing Enter in either login field to submit
+['loginUsername', 'loginPassword'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+});
 </script>
+
+</div><!-- /appWrapper -->
+
 </body>
 </html>
