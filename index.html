@@ -1008,9 +1008,9 @@ document.getElementById('inputTargetZip').addEventListener('blur', e => {
 async function runSimulation() {
   clearError();
 
-  const currentAge = parseInt(document.getElementById('inputCurrentAge').value) || 35;
+  const currentAge = parseInt(document.getElementById('inputCurrentAge').value);
   const currentAgeError = document.getElementById('currentAgeError');
-  if (currentAge < 20 || currentAge > 49) {
+  if (isNaN(currentAge) || currentAge < 20 || currentAge > 49) {
     currentAgeError.style.display = 'block';
     return;
   }
@@ -1056,9 +1056,9 @@ async function runSimulation() {
   }
   targetZipError.style.display = 'none';
 
-  const retirementAge = parseInt(document.getElementById('inputRetirementAge').value) || 65;
+  const retirementAge = parseInt(document.getElementById('inputRetirementAge').value);
   const retirementAgeError = document.getElementById('retirementAgeError');
-  if (retirementAge < 61 || retirementAge > 67) {
+  if (isNaN(retirementAge) || retirementAge < 61 || retirementAge > 67) {
     retirementAgeError.style.display = 'block';
     return;
   }
