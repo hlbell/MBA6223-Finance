@@ -631,6 +631,7 @@
               <label>Annual Contributions <span>(USD/yr)</span></label>
               <input type="text" id="inputContribution" placeholder="e.g. $18,000" value="$18,000" />
               <span class="hint">Total yearly contributions across all accounts.</span>
+              <span id="contributionError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than 0 USD.</span>
             </div>
             <div class="field">
               <label>Expected Annual Retirement Expenses <span>(USD/yr)</span></label>
@@ -957,6 +958,14 @@ async function runSimulation() {
     return;
   }
   savingsError.style.display = 'none';
+
+  const annualContribution = parseMoney(document.getElementById('inputContribution').value);
+  const contributionError = document.getElementById('contributionError');
+  if (annualContribution <= 0) {
+    contributionError.style.display = 'block';
+    return;
+  }
+  contributionError.style.display = 'none';
 
   const retirementAge = parseInt(document.getElementById('inputRetirementAge').value) || 65;
   const retirementAgeError = document.getElementById('retirementAgeError');
