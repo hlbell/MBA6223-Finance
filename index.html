@@ -603,6 +603,8 @@
       <p>Fill in your details to get a personalized retirement probability analysis.</p>
     </div>
 
+    <div id="errorBanner" style="display:none; margin-bottom:1rem; padding:.75rem 1rem; background:#fde8e8; color:#c0392b; border-radius:8px; font-size:.9rem;"></div>
+
     <div class="tool-layout tool-layout--centered" id="toolLayout">
 
       <!-- Left: Input Form -->
@@ -687,8 +689,6 @@
 
       <!-- Right: Results -->
       <div class="results-panel">
-        <div id="errorBanner" style="display:none;"></div>
-
         <div id="resultsContent" style="display:none;">
 
         <!-- Probability of Success -->
@@ -863,7 +863,7 @@
    Connects to FastAPI backend at http://localhost:8000/api
    ══════════════════════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = window.location.origin + '/api';
 let projChart = null;
 let histChart = null;
 
