@@ -863,7 +863,11 @@
    Connects to FastAPI backend at http://localhost:8000/api
    ══════════════════════════════════════════════════════════ */
 
-const API_BASE = window.location.origin + '/api';
+// Use same-origin API when served directly by the FastAPI backend (port 8000).
+// Fall back to localhost for GitHub Pages / static hosting.
+const API_BASE = (window.location.port === '8000')
+  ? window.location.origin + '/api'
+  : 'http://localhost:8000/api';
 let projChart = null;
 let histChart = null;
 
@@ -1093,7 +1097,11 @@ async function runSimulation() {
     const data = await resp.json();
     renderResults(data, payload);
   } catch(err) {
-    showError(err.message + ' — Make sure the backend server is running on port 8000.');
+    const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+    const mobileHint = isMobile
+      ? ' On mobile, open http://[your-computer-IP]:8000 instead of the GitHub Pages URL.'
+      : ' Make sure the backend server is running on port 8000.';
+    showError(err.message + mobileHint);
   } finally {
     btn.textContent = '▶ Run Monte Carlo Simulation';
     btn.disabled = false;
