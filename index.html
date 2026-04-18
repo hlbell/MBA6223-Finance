@@ -577,7 +577,7 @@
     <div class="login-fields">
       <div>
         <label for="loginUsername">Username</label>
-        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username" />
+        <input type="text" id="loginUsername" value="MBA Finance - Team 5" autocomplete="username" />
       </div>
       <div>
         <label for="loginPassword">Password</label>
@@ -1460,21 +1460,29 @@ function renderInsights(insights) {
 renderGauge({ probability_of_success: 0.75 });
 
 /* ── Login ─────────────────────────────────────────────────── */
+function showApp() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appWrapper').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
 function handleLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errorEl  = document.getElementById('loginError');
 
-  if (username === 'admin' && password === 'georetire2025') {
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('appWrapper').style.display = '';
+  if (password === 'Team5') {
+    sessionStorage.setItem('georetire_auth', '1');
     errorEl.style.display = 'none';
+    showApp();
   } else {
     errorEl.style.display = 'block';
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginPassword').focus();
   }
 }
+
+// Skip login if already authenticated in this session
+if (sessionStorage.getItem('georetire_auth') === '1') { showApp(); }
 
 // Allow pressing Enter in either login field to submit
 ['loginUsername', 'loginPassword'].forEach(id => {
