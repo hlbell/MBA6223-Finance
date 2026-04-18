@@ -176,6 +176,10 @@
     .tool-layout {
       display: grid; grid-template-columns: 380px 1fr; gap: 2.5rem; align-items: start;
     }
+    .tool-layout--centered {
+      grid-template-columns: 380px; justify-content: center;
+    }
+    .tool-layout--centered > div + div { display: none; }
 
     /* Sidebar Form */
     .form-panel {
@@ -596,7 +600,7 @@
       <p>Fill in your details to get a personalized retirement probability analysis.</p>
     </div>
 
-    <div class="tool-layout">
+    <div class="tool-layout tool-layout--centered" id="toolLayout">
 
       <!-- Left: Input Form -->
       <div>
@@ -681,6 +685,8 @@
       <!-- Right: Results -->
       <div class="results-panel">
         <div id="errorBanner" style="display:none;"></div>
+
+        <div id="resultsContent" style="display:none;">
 
         <!-- Probability of Success -->
         <div class="prob-card">
@@ -790,11 +796,12 @@
 
         </div>
 
+        </div><!-- /resultsContent -->
 
       </div>
 
       <!-- Behavioral Finance Insights — spans both columns -->
-      <div class="insight-card">
+      <div class="insight-card" id="insightCard" style="display:none;">
           <h4>🧠 Behavioral Finance Insights &amp; Recommendations</h4>
           <div class="insight-list">
 
@@ -1050,6 +1057,9 @@ function renderResults(data, payload) {
   try { renderHistogramChart(data); }   catch(e) { console.error('histChart', e); }
   try { renderCOLBars(data.col_info); } catch(e) { console.error('colBars', e); }
   try { renderInsights(data.insights); }catch(e) { console.error('insights', e); }
+  document.getElementById('toolLayout').classList.remove('tool-layout--centered');
+  document.getElementById('resultsContent').style.display = '';
+  document.getElementById('insightCard').style.display = '';
 }
 
 /* ── Probability gauge ─────────────────────────────────── */
