@@ -646,7 +646,7 @@
               <label>Expected Annual Retirement Expenses <span>(USD/yr)</span></label>
               <input type="text" id="inputExpenses" placeholder="e.g. $60,000" />
               <span class="hint">In today's dollars; adjusted for COL automatically.</span>
-              <span id="expensesError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than the current savings.</span>
+              <span id="expensesError" style="display:none; font-size:.78rem; color:var(--danger); margin-top:.25rem;">Please enter an amount greater than 0 USD.</span>
             </div>
 
             <!-- Risk tolerance -->
@@ -1034,7 +1034,7 @@ async function runSimulation() {
 
   const annualExpenses = parseMoney(document.getElementById('inputExpenses').value);
   const expensesError = document.getElementById('expensesError');
-  if (annualExpenses <= currentSavings) {
+  if (annualExpenses <= 0) {
     expensesError.style.display = 'block';
     return;
   }
