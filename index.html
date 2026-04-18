@@ -91,11 +91,18 @@
     nav {
       position: sticky; top: 0; z-index: 100;
       background: var(--navy);
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 0 2.5rem;
       height: 64px;
       box-shadow: 0 2px 16px rgba(0,0,0,.25);
     }
+    .btn-signout {
+      background: transparent; border: 1.5px solid rgba(255,255,255,.35);
+      color: var(--white); border-radius: 8px;
+      padding: .4rem 1rem; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: background .2s, border-color .2s;
+    }
+    .btn-signout:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); }
     .nav-brand {
       display: flex; align-items: center; gap: .85rem;
       font-size: 1.95rem; font-weight: 700; color: var(--white);
@@ -577,7 +584,7 @@
     <div class="login-fields">
       <div>
         <label for="loginUsername">Username</label>
-        <input type="text" id="loginUsername" value="MBA Finance - Team 5" autocomplete="username" />
+        <input type="text" id="loginUsername" value="OSU MBA (6223) - Finance" autocomplete="username" />
       </div>
       <div>
         <label for="loginPassword">Password</label>
@@ -594,9 +601,13 @@
 
 <!-- ── Navigation ──────────────────────────────────────────── -->
 <nav>
+  <div style="flex:1;"></div>
   <div class="nav-brand">
     <div class="icon">🌎</div>
     <span><span class="geo">Geo</span>Retire</span>
+  </div>
+  <div style="flex:1; display:flex; justify-content:flex-end;">
+    <button class="btn-signout" onclick="signOut()">Sign Out</button>
   </div>
 </nav>
 
@@ -931,7 +942,7 @@
 
 <!-- ── Footer ───────────────────────────────────────────────── -->
 <footer>
-  <strong>GeoRetire</strong> &mdash; Team 11 &middot; Fisher College of Business &middot; Finance Department<br>
+  <strong>GeoRetire</strong> &mdash; Team 5 &middot; Fisher College of Business &middot; Finance Department<br>
   <span style="font-size:.8rem;opacity:.6;">For educational purposes only. Not investment advice.</span>
 </footer>
 
@@ -1460,6 +1471,14 @@ function renderInsights(insights) {
 renderGauge({ probability_of_success: 0.75 });
 
 /* ── Login ─────────────────────────────────────────────────── */
+function signOut() {
+  sessionStorage.removeItem('georetire_auth');
+  document.getElementById('appWrapper').style.display = 'none';
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginPassword').value = '';
+  window.scrollTo(0, 0);
+}
+
 function showApp() {
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('appWrapper').style.display = 'block';
@@ -1470,7 +1489,7 @@ function handleLogin() {
   const password = document.getElementById('loginPassword').value;
   const errorEl  = document.getElementById('loginError');
 
-  if (password === 'Team5') {
+  if (password === 'Team5' || password === 'GoBucks') {
     sessionStorage.setItem('georetire_auth', '1');
     errorEl.style.display = 'none';
     showApp();
