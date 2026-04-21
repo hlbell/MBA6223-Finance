@@ -586,11 +586,6 @@
         <label for="loginUsername">Username</label>
         <input type="text" id="loginUsername" value="OSU MBA (6223) - Finance" autocomplete="username" />
       </div>
-      <div>
-        <label for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
-      </div>
-      <span id="loginError">Incorrect username or password.</span>
     </div>
     <button class="btn-login" onclick="handleLogin()">Sign In</button>
   </div>
@@ -1475,7 +1470,6 @@ function signOut() {
   sessionStorage.removeItem('georetire_auth');
   document.getElementById('appWrapper').style.display = 'none';
   document.getElementById('loginPage').classList.remove('hidden');
-  document.getElementById('loginPassword').value = '';
   window.scrollTo(0, 0);
 }
 
@@ -1486,28 +1480,15 @@ function showApp() {
 }
 
 function handleLogin() {
-  const password = document.getElementById('loginPassword').value;
-  const errorEl  = document.getElementById('loginError');
-
-  if (password === 'Team5' || password === 'GoBucks') {
-    sessionStorage.setItem('georetire_auth', '1');
-    errorEl.style.display = 'none';
-    showApp();
-  } else {
-    errorEl.style.display = 'block';
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('loginPassword').focus();
-  }
+  sessionStorage.setItem('georetire_auth', '1');
+  showApp();
 }
 
 // Skip login if already authenticated in this session
 if (sessionStorage.getItem('georetire_auth') === '1') { showApp(); }
 
-// Allow pressing Enter in either login field to submit
-['loginUsername', 'loginPassword'].forEach(id => {
-  document.getElementById(id).addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleLogin();
-  });
+document.getElementById('loginUsername').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
 });
 </script>
 
